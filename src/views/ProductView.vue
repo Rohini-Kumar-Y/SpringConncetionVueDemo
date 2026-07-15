@@ -1,11 +1,62 @@
 <script setup>
-import { ref } from "vue";
+import { ProductService } from "@/services/ProductService";
+import { onMounted, ref } from "vue";
 
 const product = ref({
-  name: "",
-  category: "",
-  price: ""
+    name: "",
+    category: "",
+    price: ""
 });
+
+const products = ref([]);
+
+const ps = new ProductService();
+
+function loadProducts() {
+
+    ps.retrieveAllProducts()
+        .then((res) => {
+            products.value = res.data;
+            console.log(products.value);
+        })
+        .catch((err) => {
+            console.log("Error loading products");
+            console.log(err);
+        });
+}
+
+onMounted(() => {
+    console.log("Product View Mounted");
+    loadProducts();
+});
+
+function saveProduct() {
+
+    ps.addProduct(product.value)
+        .then((res) => {
+
+            alert("✅ Product Saved Successfully!");
+
+            console.log(res.data);
+
+            product.value = {
+                name: "",
+                category: "",
+                price: ""
+            };
+
+            // Reload the table
+            loadProducts();
+
+        })
+        .catch((err) => {
+
+            alert("❌ Failed to Save Product");
+
+            console.log(err);
+
+        });
+}
 </script>
 
 <template>
@@ -80,4 +131,6 @@ const product = ref({
     </table>
 
   </div>
+  <h3 />
+  <pre>{{ product }}</pre>
 </template>
